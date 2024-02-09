@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Logo from '../../assets/ryanairbnb.png';
+import Image from "next/image";
+import { IoPersonAdd } from "react-icons/io5";
+import Navbar from "./components/Navbar";
+import { UserProvider } from '@auth0/nextjs-auth0/client';
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,10 +19,17 @@ export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>) 
+{
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <UserProvider>
+      <body className={inter.className}>
+      <Navbar />
+      {children}
+      <Toaster />
+      </body>
+      </UserProvider>
     </html>
   );
 }
