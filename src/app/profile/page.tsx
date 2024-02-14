@@ -104,7 +104,7 @@ const ProfilePage = () => {
       </div>
       <div className=" flex flex-col ml-[50px] lg:ml-[0px]">
         <h1 className="text-[2rem] font-semibold pb-[25px]">Your <span className="text-[#436ad3]">bookings:</span></h1>
-          {bookings.map(item => (
+        {bookings ? bookings.map(item => (
             <div key={item.id} className="w-auto xl:w-[800px] border-t border-t-solid border-t-[#eee]">
             <div className="py-[25px] flex">
       <div key={item.id} className="flex flex-col sm:flex-row gap-[25px]">
@@ -132,7 +132,14 @@ const ProfilePage = () => {
       </div>
       </div>
       </div>
-    ))}
+    )) : 
+    <div className="w-auto xl:w-[800px] border-t border-t-solid border-t-[#eee]">
+        <div className="py-[25px] text-[1.5rem] font-medium">
+          No bookings yet. Browse our properties <Link href="/"><Button>here</Button></Link>
+        </div>
+    </div>          
+    }
+          
   </div>
     </div>
   )

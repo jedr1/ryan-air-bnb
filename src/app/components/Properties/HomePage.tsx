@@ -66,44 +66,44 @@ const HomePage: FC = () => {
     const propertyRef = collection(db, "properties");
 
     //Fetch Properties
-    const fetchProperties = async () => {
-        try {
-        setLoading(true);
-        const data = await getDocs(propertyRef);
-        const properties: Property[] = [];
-
-        //Fetch Booking Datat for Each Property
-        for(const item of data.docs) {
-            const propertyData = item.data();
-            const propertyId = item.id;
-            const bookingsRef = collection(db, 'properties', propertyId, 'bookings');
-            const bookingData = await getDocs(bookingsRef);
-            const bookings: Booking[] = bookingData.docs.map((item) => {
-                const booking = { ...item.data(), id: item.id } as Booking;
-                return booking;
-            });
-            properties.push({
-                id: propertyId,
-                title: propertyData.title,
-                host: propertyData.host,
-                image: propertyData.image,
-                date: propertyData.date,
-                price: propertyData.price,
-                isPetFriendly: propertyData.isPetFriendly,
-                bookings: bookings
-            });
-            console.log("Bookings:", bookings);
-        }
-        
-        setPropertyList(properties);
-        } catch(err) {
-            console.error(err);
-        }
-        finally {
-            setLoading(false);
-        }
-    }
     useEffect(() => {
+        const fetchProperties = async () => {
+            try {
+            setLoading(true);
+            const data = await getDocs(propertyRef);
+            const properties: Property[] = [];
+    
+            //Fetch Booking Datat for Each Property
+            for(const item of data.docs) {
+                const propertyData = item.data();
+                const propertyId = item.id;
+                const bookingsRef = collection(db, 'properties', propertyId, 'bookings');
+                const bookingData = await getDocs(bookingsRef);
+                const bookings: Booking[] = bookingData.docs.map((item) => {
+                    const booking = { ...item.data(), id: item.id } as Booking;
+                    return booking;
+                });
+                properties.push({
+                    id: propertyId,
+                    title: propertyData.title,
+                    host: propertyData.host,
+                    image: propertyData.image,
+                    date: propertyData.date,
+                    price: propertyData.price,
+                    isPetFriendly: propertyData.isPetFriendly,
+                    bookings: bookings
+                });
+                console.log("Bookings:", bookings);
+            }
+            
+            setPropertyList(properties);
+            } catch(err) {
+                console.error(err);
+            }
+            finally {
+                setLoading(false);
+            }
+        }
         fetchProperties();
     }, []);
     
