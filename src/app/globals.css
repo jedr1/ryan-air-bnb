@@ -55,10 +55,9 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground w-[100vw] overflow-x-hidden;
   }
 }
-
 body {
   @apply max-w-[100vw] overflow-x-hidden
 }

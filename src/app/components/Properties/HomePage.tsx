@@ -27,12 +27,18 @@ import { IoAddOutline, IoTerminalSharp, IoSearchOutline } from "react-icons/io5"
 import Link from 'next/link';
 import LoadingSkeleton from '@/app/LoadingSkeleton';
 import { Item } from '@radix-ui/react-navigation-menu';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@auth0/nextjs-auth0/client';
+import { useToast } from '@/components/ui/use-toast';
 
 interface Booking {
-    startDate?: { seconds: number, nanoseconds: number };
-    endDate?: { seconds: number, nanoseconds: number };
-    id?: string;
-}
+    id: string;
+    bookings: {
+        startDate?: { seconds: number, nanoseconds: number };
+        endDate?: { seconds: number, nanoseconds: number };
+      userId?: string;
+    };
+  }
 
 interface Property {
     title: string;
@@ -42,9 +48,13 @@ interface Property {
     image?: string;
     id: string;
     isPetFriendly?: boolean;
-    bookings?: Booking[]; // Modify this line to use the Bookings interface
+    bookings?: Booking[]; 
 }
 const HomePage: FC = () => {
+    const router  = useRouter();
+    const { user } = useUser();
+    const { toast } = useToast();
+
     //State Management
     const [propertyList, setPropertyList] = useState<Property[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>('');
@@ -52,7 +62,7 @@ const HomePage: FC = () => {
     const [checkOutDate, setCheckOutDate] = useState<Date | undefined>(undefined);
     const [loading, setLoading] = useState<boolean>(true);
 
-    //Collection Referance
+    //Collection Reference
     const propertyRef = collection(db, "properties");
 
     //Fetch Properties
@@ -70,7 +80,6 @@ const HomePage: FC = () => {
             const bookingData = await getDocs(bookingsRef);
             const bookings: Booking[] = bookingData.docs.map((item) => {
                 const booking = { ...item.data(), id: item.id } as Booking;
-                console.log("Booking Start Date:", booking.startDate);
                 return booking;
             });
             properties.push({
@@ -131,25 +140,35 @@ const HomePage: FC = () => {
         setPropertyList(filteredProps);
     };
 
+    //Authorize Add-To-Properties Page
+    const handleNavigation = () => {
+        if (user) {
+          router.push('/add-a-property');
+        } else {
+            toast({
+                title: "Please Sign In",
+                description: 'Sign in to add a property to Ryan AirBnb',
+              })
+        }
+      };
+
   return (
     <div className="w-full flex flex-col items-center justify-center">
-        <div className="my-8 flex items-center justify-center px-6 py-4 border border-solid border-[#eee] rounded-l-full shadow-lg focus:outline-none focus:border-blue-500 rounded-r-full">
+        <div className="my-8 flex items-center justify-center px-4 sm:px-6 py-4 border border-solid border-[#eee] rounded-l-full shadow-lg focus:outline-none focus:border-blue-500 rounded-r-full">
         <div className="mr-[10px]">
             <div className="flex items-center justify-center gap-2">
-            <Link href="/add-a-property">
-            <div className="bg-[#436ad3] rounded-full h-[50px] w-[50px] flex items-center justify-center transition duration-300 ease-in-out hover:bg-[#6180df] hover:rotate-90 hover:cursor-pointer">
+            <div onClick={handleNavigation} className="bg-[#436ad3] rounded-full hidden h-[50px] w-[50px] sm:flex items-center justify-center transition duration-300 ease-in-out hover:bg-[#6180df] hover:rotate-90 hover:cursor-pointer">
             <IoAddOutline className="text-[#fff] text-[2rem]" />
             </div>
-            </Link>
-            <div className="text-[0.9rem] font-semibold">Add a Property</div>
+            <div className="text-[0.9rem] font-semibold hidden md:block">Add a Property</div>
             </div>
         </div>
-        <div  className="border-l border-l-solid border-l-[#eee] h-full pl-[12.5px]">
+        <div  className="border-l border-l-solid border-l-[#eee] h-full pl-[12.5px] hidden lg:block">
         <div className="w-[300px] ">
         <input type="search" onChange={(e) => setSearchTerm(e.target.value)} placeholder={`Search our properties...`} className="block w-full px-4 py-2 border border-gray-300 rounded-l-full focus:outline-none focus:border-blue-500 rounded-r-full" />
         </div>
         </div>
-        <NavigationMenu className="">
+        <NavigationMenu >
           <NavigationMenuList>
         <NavigationMenuItem  className="border-l border-l-solid border-l-[#eee] h-full ">
             <NavigationMenuTrigger>{checkInDate ? checkInDateString :"Check In Date"}</NavigationMenuTrigger>
@@ -176,10 +195,10 @@ const HomePage: FC = () => {
         
       </NavigationMenuList>
     </NavigationMenu>
-    <div onClick={handleFilterButtonClick} className="bg-[#436ad3] rounded-full h-[50px] w-[50px] flex items-center justify-center transition duration-300 ease-in-out hover:bg-[#6180df] hover:cursor-pointer"><IoSearchOutline className="text-[1.8rem] text-white"/></div>
+    <div onClick={handleFilterButtonClick} className="bg-[#436ad3] rounded-full h-[35px] w-[35px] sm:h-[50px] sm:w-[50px] flex items-center justify-center transition duration-300 ease-in-out hover:bg-[#6180df] hover:cursor-pointer"><IoSearchOutline className="text-[1.5rem] sm:text-[1.8rem] text-white"/></div>
     </div>
     <div className="flex flex-col items-center justify-center">
-        {loading? <LoadingSkeleton /> : <div className="grid grid-cols-4 gap-4">
+        {loading? <LoadingSkeleton /> : <div className="grid 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-4">
         {propertyList.filter((val) => {
             if (searchTerm == '') {
                 return val;
@@ -189,7 +208,11 @@ const HomePage: FC = () => {
                 return val;
             }
         }).map((item) => (
-            <Card key={item.id}>
+            <Link href={{
+                pathname: "/properties",
+                query: {id: item.id}
+            }}>
+            <Card key={item.id} className="hover:cursor-pointer">
                 <CardHeader>
                 {item.image ? 
                 <img src={item.image} alt="" className="w-[300px] h-[300px] rounded-lg object-cover" /> 
@@ -213,6 +236,7 @@ const HomePage: FC = () => {
                     {item.isPetFriendly && <div className="flex items-center justify-center gap-1 text-green-500"><MdOutlinePets/><div className="text-[0.9rem]">Pet Friendly!</div></div> }
                 </CardFooter>
             </Card>
+            </Link>
         ))}
     </div>}
     

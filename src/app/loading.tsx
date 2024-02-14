@@ -1,13 +1,9 @@
-import SkeletonCard from "@/components/custom/SkeletonCard";
+import ClipLoader from "react-spinners/ClipLoader";
 
 export default function loading() {
   return (
-    <main>
-    <div className="grid grid-cols-4 gap-4">
-        {"abcdefgh".split('').map((i) => (
-            <SkeletonCard key={i} />
-        ))}
-    </div>
+    <main className="w-full h-[80vh] flex items-center justify-center">
+    <ClipLoader color="#436ad3" />
     </main>
   )
 }

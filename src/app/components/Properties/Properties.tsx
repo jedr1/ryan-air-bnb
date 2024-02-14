@@ -1,11 +1,15 @@
+import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { db, storage } from '@/firebase/firebase-config'
 import { addDoc, collection, getDocs, SnapshotMetadata } from 'firebase/firestore'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import Image from 'next/image';
-import React, { FC, useState, useEffect } from 'react'
+import React, { FC, useState, useEffect } from 'react';
+import { HiOutlineXMark } from "react-icons/hi2";
+import { TiTick } from "react-icons/ti";
 import { v4 } from 'uuid';
 import PropertyItem from './PropertyItem';
+import ClipLoader from "react-spinners/ClipLoader";
 
 interface Property {
     title?: string,
@@ -20,6 +24,8 @@ const Properties: FC = () => {
     //State Management
     const [propertyList, setPropertyList] = useState<Property[]>([]);
     const [imageUpload, setImageUpload] = useState<File | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadComplete, setUploadComplete] = useState(false);
     const [imageURL, setImageURL] = useState<string>('');
     const [propTitle, setPropTitle] = useState<string>('');
     const [propHost, setPropHost] = useState<string>('');
@@ -33,7 +39,11 @@ const Properties: FC = () => {
 
     //Upload Image to Firebase
     const handleImageUpload = async () => {
-        if(!imageUpload) return;
+        setIsUploading(true);
+        if(!imageUpload) {
+            setIsUploading(false);
+            return;
+        };
         const imageFolderRef = ref(storage, `properties/${imageUpload.name + v4()}`);
         try {
             await uploadBytes(imageFolderRef, imageUpload);
@@ -41,6 +51,10 @@ const Properties: FC = () => {
             setImageURL(downloadURL); 
         } catch (err) {
             console.error(err);
+            setIsUploading(false);
+        } finally {
+            setIsUploading(false);
+            setUploadComplete(true);
         }
     }
 
@@ -59,6 +73,16 @@ const Properties: FC = () => {
             setImageURL("");
         } catch(err) {
             console.error(err);
+        } finally {
+            // Clear all input fields and reset state
+            setPropTitle('');
+            setPropHost('');
+            setPropDate('');
+            setPropPrice(0);
+            setIsPetFriendly(false);
+            setImageUpload(null);
+            setUploadComplete(false);
+            setImageURL('');
         }
     } 
  
@@ -76,22 +100,40 @@ const Properties: FC = () => {
         fetchProperties();
     }, [])
   return (
-    <div>
+    <div className="w-full flex items-center justify-center flex-col">
+        <div className="w-[90vw] lg:w-[70%]">
+        <h1 className="font-medium text-[2rem] py-[15px]">Add your <span className="text-[#436ad3]">property</span></h1>
+        <div className=" flex flex-col gap-[15px]">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-[10px]">
+        <input type="text" value={propTitle} placeholder="Property title" onChange={(e) => setPropTitle(e.target.value)} />
+        <input type="text" value={propHost} placeholder="Host" onChange={(e) => setPropHost(e.target.value)} />
+        <input type="text" value={propDate} placeholder="Date" onChange={(e) => setPropDate(e.target.value)} />
         <div>
-        <input type="text" placeholder="Property title" onChange={(e) => setPropTitle(e.target.value)} />
-        <input type="text" placeholder="Host" onChange={(e) => setPropHost(e.target.value)} />
-        <input type="text" placeholder="Date" onChange={(e) => setPropDate(e.target.value)} />
-        <input type="number" placeholder="Price per night" onChange={(e) => {setPropPrice(Number(e.target.value))}} />
-        <div className="flex">
-            <div>Pet Friendly?</div>
-        <input type="checkbox" checked={isPetFriendly} onChange={(e) => {setIsPetFriendly(e.target.checked)}}/>
+            <div className="text-[#333] font-light text-[0.9rem]">Price per Night</div>
+        <input type="number" value={propPrice} placeholder="Price per night" onChange={(e) => {setPropPrice(Number(e.target.value))}} />
+        </div>
+        </div>
+        <div className="flex items-center gap-[40px]">
+        <div className="flex items-center gap-[10px]">
+        <input className="w-[18px] h-[18px] hover:cursor-pointer" type="checkbox" checked={isPetFriendly} onChange={(e) => {setIsPetFriendly(e.target.checked)}}/>
+        <div className="text-[1.2rem]">Pet Friendly?</div>
         </div>
         <input type="file" onChange={(e) => setImageUpload(e.target.files?.[0] || null)} />
-        <button onClick={handleImageUpload}>Upload Image</button>
-        <button onClick={handleSubmit}>Submit Property</button>
+        </div>
+        <div className="flex gap-[25px]">
+            <div className="flex items-center justify-center gap-[10px]">
+        <button onClick={handleImageUpload} className="border border-solid border-[#ee] rounded-[10px] px-6 py-4 transition duration-300 hover:border-[#436ad3] focus:border-[#436ad3]">Upload Image</button>
+        {isUploading ? <ClipLoader color="#436ad3" /> : !uploadComplete ? 
+        null : <div className="bg-green-500 h-[30px] w-[30px] flex items-center justify-center rounded-full transition duration-300 ease-in-out">
+            <TiTick className="text-white text-[1.2rem]"/></div>}
+        </div>
+        {uploadComplete ? <Button onClick={handleSubmit} className="py-7 px-6 transition duration-300 ease-in-out">Submit Property</Button> : null}
+        
+        </div>
+        </div>
         </div>
         <div className="w-full flex flex-col items-center justify-center">
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-4">
         {propertyList.map((prop: Property) => (
         <div>
             <PropertyItem key={prop.id} item={prop} />
