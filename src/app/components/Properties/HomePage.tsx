@@ -105,7 +105,7 @@ const HomePage: FC = () => {
     }
     useEffect(() => {
         fetchProperties();
-    }, [fetchProperties]);
+    }, []);
     
     //Stringify Check In/Out Dates
     let checkInDateString = '';
