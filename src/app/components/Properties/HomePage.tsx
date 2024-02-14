@@ -105,7 +105,7 @@ const HomePage: FC = () => {
     }
     useEffect(() => {
         fetchProperties();
-    }, []);
+    }, [fetchProperties]);
     
     //Stringify Check In/Out Dates
     let checkInDateString = '';
@@ -211,7 +211,7 @@ const HomePage: FC = () => {
             <Link href={{
                 pathname: "/properties",
                 query: {id: item.id}
-            }}>
+            }} key={item.id}>
             <Card key={item.id} className="hover:cursor-pointer">
                 <CardHeader>
                 {item.image ? 

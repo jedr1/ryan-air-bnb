@@ -98,7 +98,7 @@ const Properties: FC = () => {
     }
     useEffect(() => {
         fetchProperties();
-    }, [])
+    }, [fetchProperties])
   return (
     <div className="w-full flex items-center justify-center flex-col">
         <div className="w-[90vw] lg:w-[70%]">
@@ -135,8 +135,8 @@ const Properties: FC = () => {
         <div className="w-full flex flex-col items-center justify-center">
         <div className="grid 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-4">
         {propertyList.map((prop: Property) => (
-        <div>
-            <PropertyItem key={prop.id} item={prop} />
+        <div key={prop.id}>
+            <PropertyItem item={prop} />
         </div>
     ))
     }

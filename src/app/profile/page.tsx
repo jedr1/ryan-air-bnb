@@ -69,7 +69,7 @@ const ProfilePage = () => {
   }
   console.log(bookings);
     fetchBookings()
-  }, [user]);
+  }, [user, isLoading, error]);
 
   if(isLoading) {
     return <div className="h-[80vh] w-full flex items-center justify-center"><ClipLoader color="#436ad3"/></div>
@@ -95,7 +95,7 @@ const ProfilePage = () => {
       </div>
       </div>
       <div className="px-6 py-6 mt-[40px] border border-solid border-[#eee] p-4 w-[350px] flex flex-col items-start justify-start gap-[25px] rounded-[20px]">
-        <h1 className="text-[1.5rem] font-medium">{user?.name?.split(" ")[0]}'s information:</h1>
+        <h1 className="text-[1.5rem] font-medium">{`${user?.name?.split(" ")[0]}'s information:`}</h1>
         <div>
         <div className="text-[#436ad3]">Email: <span className='text-black'>{user.email}</span></div>
       <p className="text-[#436ad3]">Current Bookings: <span className='text-black'>{bookings.length}</span></p>
@@ -105,7 +105,7 @@ const ProfilePage = () => {
       <div className=" flex flex-col ml-[50px] lg:ml-[0px]">
         <h1 className="text-[2rem] font-semibold pb-[25px]">Your <span className="text-[#436ad3]">bookings:</span></h1>
           {bookings.map(item => (
-            <div className="w-auto xl:w-[800px] border-t border-t-solid border-t-[#eee]">
+            <div key={item.id} className="w-auto xl:w-[800px] border-t border-t-solid border-t-[#eee]">
             <div className="py-[25px] flex">
       <div key={item.id} className="flex flex-col sm:flex-row gap-[25px]">
         

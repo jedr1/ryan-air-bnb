@@ -31,11 +31,11 @@ interface Property {
     date?: string,
     isPetFriendly?: boolean,
 }
-export default function page() {
+export default function Page() {
     //State Management
     const [property, setProperty] = useState<Property | null>(null);
-    const [startDate, setStartDate] = useState<Date | null>(null);
-    const [endDate, setEndDate] = useState<Date | null>(null);
+    const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+    const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
     //Get Property ID from URL
     const searchParams = useSearchParams();
