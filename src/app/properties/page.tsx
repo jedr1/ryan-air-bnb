@@ -70,7 +70,9 @@ export default function Page() {
         try {
             //Get userID
                 if (!user) {
-                    console.log('User is not authenticated');
+            toast({
+                title:"Please Sign in to Make a Booking",
+            })
                     return;
                 }
                 const userId = user.sub;
@@ -91,9 +93,6 @@ export default function Page() {
             console.log('Booking successfully added!')
         } catch(err) {
             console.log('Error booking property:', err);
-            toast({
-                title:"Please Sign in to Make a Booking",
-            })
         }
     }
   return (
