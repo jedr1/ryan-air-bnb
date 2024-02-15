@@ -91,6 +91,9 @@ export default function Page() {
             console.log('Booking successfully added!')
         } catch(err) {
             console.log('Error booking property:', err);
+            toast({
+                title:"Please Sign in to Make a Booking",
+            })
         }
     }
   return (
