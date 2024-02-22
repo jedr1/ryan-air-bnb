@@ -88,7 +88,7 @@ export default function Page() {
             });
             toast({
                 title: "Your Booking was Successful!",
-                description: `${startDate} until ${endDate}`,
+                description: `${startDate} until ${endDate}!`,
               })
             console.log('Booking successfully added!')
         } catch(err) {
